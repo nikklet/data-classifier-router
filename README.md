@@ -14,6 +14,23 @@ All incoming requests landed in one place, and someone had to read each one and 
 4. **Route:** A Switch node sends the item to that department's Slack channel or system.
 5. **Fallback:** Anything the model can't classify confidently goes to a review queue instead of being guessed.
 
+## Architecture
+
+```mermaid
+flowchart LR
+A["Tally form"] --> D["Normalize to one lead format"]
+B["Google Form"] --> D
+C["Email"] --> E["LLM extracts details"]
+E --> D
+D --> F["Enrich via APIs"]
+F --> G{"Duplicate check"}
+G --> H["HubSpot"]
+G --> I["Google Sheets log"]
+H --> J["Slack alert to sales"]
+I --> J
+K["Error workflow"] -.-> L["Slack failure alert"]
+```
+
 ## Problems Solved
 - **Failures on large data volumes.** Large payloads were causing nodes to fail mid-run. I added a Loop Over Items node to split the data into smaller batches, so the workflow processes it in manageable chunks and finishes reliably regardless of size.
 - **Inconsistent labels.** The prompt restricts the model to a fixed list of departments, and a structured output parser enforces the format so routing never breaks on unexpected text.
