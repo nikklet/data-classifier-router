@@ -18,17 +18,15 @@ All incoming requests landed in one place, and someone had to read each one and 
 
 ```mermaid
 flowchart LR
-A["Tally form"] --> D["Normalize to one lead format"]
-B["Google Form"] --> D
-C["Email"] --> E["LLM extracts details"]
-E --> D
-D --> F["Enrich via APIs"]
-F --> G{"Duplicate check"}
-G --> H["HubSpot"]
-G --> I["Google Sheets log"]
-H --> J["Slack alert to sales"]
-I --> J
-K["Error workflow"] -.-> L["Slack failure alert"]
+A["Webhook or API"] --> B["Loop Over Items: batch"]
+B --> C["LLM classifies: department, category, urgency"]
+C --> D{"Switch by department"}
+D --> E["Sales"]
+D --> F["Customer Support"]
+D --> G["Billing and Finance"]
+D --> H["HR"]
+D --> I["Operations"]
+C -.->|"low confidence"| J["Human review queue"]
 ```
 
 ## Problems Solved
